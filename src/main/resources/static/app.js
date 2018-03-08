@@ -14,8 +14,8 @@ var app = (function () {
         var ctx = canvas.getContext("2d");
         ctx.beginPath();
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
-        ctx.stroke();
-        var message = {x:point.x, y:point.y};               
+        ctx.stroke();   
+        var message = {x:point.x, y:point.y};     
         stompClient.send("/topic/newpoint", {}, JSON.stringify(message));
     };
     
@@ -39,7 +39,12 @@ var app = (function () {
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/newpoint', function (eventbody) {
-				//var theObject = JSON.parse(eventbody.body);
+				var theObject=JSON.parse(eventbody.body);
+				var canvas = document.getElementById("canvas");
+				var ctx = canvas.getContext("2d");
+				ctx.beginPath();
+				ctx.arc(theObject.x, theObject.y, 3, 0, 2 * Math.PI);
+				ctx.stroke();				
                 alert(eventbody.body);                
             });
         });
