@@ -7,7 +7,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of0
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -23,7 +23,7 @@ package edu.eci.arsw.collabpaint.model;
 public class Point {
     int x,y;
 
-    public Point() {
+    public Point(){
     }
 
     public Point(int x, int y) {
@@ -50,8 +50,7 @@ public class Point {
     @Override
     public String toString() {
         return "Point{" + "x=" + x + ", y=" + y + '}';
-    }
-    
+    } 
     
     
     
