@@ -22,7 +22,7 @@ var app = (function () {
     
     var getMousePosition = function (evt) {
         canvas = document.getElementById("canvas");
-        var rect = canvas.getBoundingClientRect();
+        var rect = canvas.getBoundingClientRect();		
         return {
             x: evt.clientX - rect.left,
             y: evt.clientY - rect.top
@@ -45,7 +45,7 @@ var app = (function () {
 				ctx.beginPath();
 				ctx.arc(theObject.x, theObject.y, 3, 0, 2 * Math.PI);
 				ctx.stroke();				
-                alert(eventbody.body);                
+                //alert(eventbody.body);                
             });
         });
 
@@ -56,18 +56,18 @@ var app = (function () {
     return {
 
         init: function () {
-            var can = document.getElementById("canvas");
-            
+            var can = document.getElementById("canvas");            
             //websocket connection
             connectAndSubscribe();
+			
         },
 
-        publishPoint: function(px,py){
-            var pt=new Point(px,py);
-            console.info("publishing point at "+pt);
-            addPointToCanvas(pt);
-
-            //publicar el evento
+        publishPoint: function(ev){
+            //var pt=new Point(px,py);
+            //console.info("publishing point at "+pt);
+			var pt = getMousePosition(ev);			
+            addPointToCanvas(pt);			
+            //publicar el evento			
         },
 
         disconnect: function () {
@@ -76,7 +76,9 @@ var app = (function () {
             }
             setConnected(false);
             console.log("Disconnected");
-        }
-    };
+		},		
+		
+    }
+	
 
 })();
