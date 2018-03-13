@@ -17,7 +17,7 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();   
         var message = {x:point.x, y:point.y};     
-        stompClient.send('/topic/newpoint.'+identi, {}, JSON.stringify(message));
+        stompClient.send('/app/newpoint.'+identi, {}, JSON.stringify(message));
     };
     
     
@@ -31,14 +31,15 @@ var app = (function () {
     };
 
 
-    var connectAndSubscribe = function (ide) {
-		identi = ide;
-        console.info('Connecting to WS...');
+    var connectAndSubscribe = function (ide) {		
+		
+		console.info('Connecting to WS...');
         var socket = new SockJS('/stompendpoint');
         stompClient = Stomp.over(socket);
         
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
+			identi = ide;
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/newpoint.'+identi, function (eventbody) {
 				var theObject=JSON.parse(eventbody.body);
@@ -46,8 +47,7 @@ var app = (function () {
 				var ctx = canvas.getContext("2d");
 				ctx.beginPath();
 				ctx.arc(theObject.x, theObject.y, 3, 0, 2 * Math.PI);
-				ctx.stroke();				
-                //alert(eventbody.body);                
+				ctx.stroke();				                
             });
         });
 
@@ -58,18 +58,20 @@ var app = (function () {
     return {
 
         init: function (ide) {
-            var can = document.getElementById("canvas");            
+            var can = document.getElementById("canvas");          
+            
             //websocket connection
             connectAndSubscribe(ide);
 			
         },
 
-        publishPoint: function(ev){
-            //var pt=new Point(px,py);
-            //console.info("publishing point at "+pt);
-			var pt = getMousePosition(ev);			
+        publishPoint: function(ev){			            
+			var put = getMousePosition(ev);			
+			var pt = new Point(put.x, put.y);
             addPointToCanvas(pt);			
-            //publicar el evento			
+            //publicar el evento	            
+            stompClient.send("/topic/newpoint."+identi, {}, JSON.stringify(pt)); 		
+          
         },
 
         disconnect: function () {
@@ -78,7 +80,7 @@ var app = (function () {
             }
             setConnected(false);
             console.log("Disconnected");
-		},		
+		}		
 		
     }
 	
