@@ -32,28 +32,26 @@ public class STOMPMessagesHandler {
 
     @MessageMapping("/newpoint.{numdibujo}")    
     public void handlePointEvent(Point pt, @DestinationVariable String numdibujo) throws Exception {        
-        Jedis jedis = JedisUtil.getPool().getResource();
-	    
-	//Operaciones	 
-        Transaction tx = jedis.multi();
-        tx.watch("X", "Y");
-        tx.rpush("X", String.valueOf(pt.getX()));
-        tx.rpush("Y", String.valueOf(pt.getY()));
-        List<Object> res = tx.exec();
-        
-        System.out.println(res.size() + "  TAMAÑO RES");
-	    
-        jedis.close();
-        
-    	/**if(polygons.containsKey(numdibujo)){
+        //Operaciones
+        try (Jedis jedis = JedisUtil.getPool().getResource()) {
+            //Operaciones
+            Transaction tx = jedis.multi();
+            tx.watch("X", "Y");
+            tx.rpush("X", String.valueOf(pt.getX()));
+            tx.rpush("Y", String.valueOf(pt.getY()));
+            List<Object> res = tx.exec();
+            System.out.println(res.size() + "  TAMAÑO RES");
+            /**if(polygons.containsKey(numdibujo)){
             polygons.get(numdibujo).add(pt);
             if(polygons.get(numdibujo).size()>=3){
-                msgt.convertAndSend("/topic/newpolygon."+numdibujo, polygons.get(numdibujo));
+            msgt.convertAndSend("/topic/newpolygon."+numdibujo, polygons.get(numdibujo));
             }
-        }else{
+            }else{
             ArrayList list = new ArrayList<>();
             list.add(pt);
-            polygons.put(numdibujo, list);                        
-        }**/                        
+            polygons.put(numdibujo, list);
+            }**/                        
+        }
+                        
     }
 }
