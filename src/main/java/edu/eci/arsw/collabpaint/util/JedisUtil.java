@@ -1,4 +1,4 @@
-package util;
+package edu.eci.arsw.collabpaint.util;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
