@@ -6,6 +6,7 @@
 package edu.eci.arsw.collabpaint;
 
 import edu.eci.arsw.collabpaint.model.Point;
+import edu.eci.arsw.collabpaint.persistence.Persistencia;
 import edu.eci.arsw.collabpaint.util.JedisUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,38 +28,12 @@ import redis.clients.jedis.Transaction;
 public class STOMPMessagesHandler {
     
     @Autowired
-    SimpMessagingTemplate msgt;
-    ConcurrentHashMap<String, ArrayList<Point>> polygons = new ConcurrentHashMap<>();
+    Persistencia msgt;
+    
 
     @MessageMapping("/newpoint.{numdibujo}")    
-    public void handlePointEvent(Point pt, @DestinationVariable String numdibujo) throws Exception {        
-        
+    public void handlePointEvent(Point pt, @DestinationVariable String numdibujo) throws Exception {                
         System.out.println("SI ENTRO");
-        
-        Jedis jedis;
-        jedis = JedisUtil.getPool().getResource();
-	
-	//Operaciones	 
-        Transaction tx = jedis.multi();
-        List<Object> res = tx.exec();        
-        while(res.size()!=0){
-            tx.watch("X", "Y");
-            tx.rpush("X", String.valueOf(pt.getX()));
-            tx.rpush("Y", String.valueOf(pt.getY()));
-            res = tx.exec();
-        }                       	            
-        
-    	if(polygons.containsKey(numdibujo)){
-            polygons.get(numdibujo).add(pt);
-            if(polygons.get(numdibujo).size()>=3){
-                msgt.convertAndSend("/topic/newpolygon."+numdibujo, polygons.get(numdibujo));
-            }
-        }else{
-            ArrayList list = new ArrayList<>();
-            list.add(pt);
-            polygons.put(numdibujo, list);                        
-        }
-        
-        jedis.close();
+        msgt.handlePointEvent(pt, numdibujo);
     }
 }
